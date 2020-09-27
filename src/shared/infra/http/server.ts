@@ -4,11 +4,11 @@ import express from 'express';
 import cors from 'cors';
 import 'express-async-errors';
 
-import exceptionHandler from './shared/middlewares/exceptionHandler';
+import exceptionHandler from './middlewares/exceptionHandler';
 import routes from './routes';
-import uploadConfig from './config/upload';
+import uploadConfig from '../../../config/upload';
 
-import './shared/database';
+import '../typeorm';
 
 const app = express();
 
