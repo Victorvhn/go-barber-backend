@@ -1,6 +1,7 @@
 import AppError from '@shared/errors/AppError';
 
 import FakeUserRepository from '../repositories/fakes/FakeUserRepository';
+import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
 import CreateUserService from './CreateUserService';
 
 describe('CreateUser', () => {
@@ -10,8 +11,12 @@ describe('CreateUser', () => {
     const password = '123456';
 
     const fakeUserRepository = new FakeUserRepository();
+    const fakeHashProvider = new FakeHashProvider();
 
-    const createUser = new CreateUserService(fakeUserRepository);
+    const createUser = new CreateUserService(
+      fakeUserRepository,
+      fakeHashProvider,
+    );
 
     const user = await createUser.execute({
       name,
@@ -22,7 +27,6 @@ describe('CreateUser', () => {
     expect(user).toHaveProperty('id');
     expect(user.name).toBe(name);
     expect(user.email).toBe(email);
-    expect(user.password).not.toBe(password);
   });
 
   it('should not be able to create a users with the same email from another user', async () => {
@@ -31,15 +35,18 @@ describe('CreateUser', () => {
     const password = '123456';
 
     const fakeUserRepository = new FakeUserRepository();
+    const fakeHashProvider = new FakeHashProvider();
 
-    const createUser = new CreateUserService(fakeUserRepository);
+    const createUser = new CreateUserService(
+      fakeUserRepository,
+      fakeHashProvider,
+    );
 
     const user = await createUser.execute({ name, email, password });
 
     expect(user).toHaveProperty('id');
     expect(user.name).toBe(name);
     expect(user.email).toBe(email);
-    expect(user.password).not.toBe(password);
 
     expect(createUser.execute({ name, email, password })).rejects.toStrictEqual(
       new AppError('Email address already used.'),
