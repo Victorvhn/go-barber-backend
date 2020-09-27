@@ -26,7 +26,7 @@ describe('CreateAppointment', () => {
     expect(appointment.providerId).toBe(providerId);
   });
 
-  it('should not be able to create two appointment on the sema time', async () => {
+  it('should not be able to create two appointment on the same time', async () => {
     const date = startOfHour(new Date(2020, 9, 27, 3, 39));
     const providerId = '123456';
 
@@ -41,15 +41,15 @@ describe('CreateAppointment', () => {
       providerId,
     });
 
+    expect(appointment).toHaveProperty('id');
+    expect(appointment.date).toStrictEqual(date);
+    expect(appointment.providerId).toBe(providerId);
+
     expect(
       createAppointment.execute({
         date,
         providerId,
       }),
     ).rejects.toStrictEqual(new AppError('This appointment is already booked'));
-
-    expect(appointment).toHaveProperty('id');
-    expect(appointment.date).toStrictEqual(date);
-    expect(appointment.providerId).toBe(providerId);
   });
 });
