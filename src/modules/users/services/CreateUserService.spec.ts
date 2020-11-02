@@ -48,8 +48,8 @@ describe('CreateUser', () => {
     expect(user.name).toBe(name);
     expect(user.email).toBe(email);
 
-    expect(createUser.execute({ name, email, password })).rejects.toStrictEqual(
-      new AppError('Email address already used.'),
-    );
+    await expect(
+      createUser.execute({ name, email, password }),
+    ).rejects.toStrictEqual(new AppError('Email address already used.'));
   });
 });

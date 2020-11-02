@@ -45,7 +45,7 @@ describe('CreateAppointment', () => {
     expect(appointment.date).toStrictEqual(date);
     expect(appointment.providerId).toBe(providerId);
 
-    expect(
+    await expect(
       createAppointment.execute({
         date,
         providerId,
