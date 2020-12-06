@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 import AppError from '@shared/errors/AppError';
 
 import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
@@ -136,5 +138,15 @@ describe('UpdateProfile', () => {
         password: '1234567',
       }),
     ).rejects.toStrictEqual(new AppError('Old password does not match.', 400));
+  });
+
+  it('should not be able update the profile from non-existing user', async () => {
+    await expect(
+      updateProfileService.execute({
+        userId: uuid(),
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+      }),
+    ).rejects.toStrictEqual(new AppError('User not found.', 400));
   });
 });
