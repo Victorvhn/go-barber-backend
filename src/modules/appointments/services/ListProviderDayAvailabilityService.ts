@@ -31,27 +31,27 @@ class ListProviderDayAvailabilityService {
     const appointments = await this.appointmentRepository.findAllInDayFromProvider(
       {
         providerId,
-        day,
-        month,
         year,
+        month,
+        day,
       },
     );
 
     const hourStart = 8;
-
-    const currentDate = new Date(Date.now());
 
     const eachHourArray = Array.from(
       { length: 10 },
       (_, index) => index + hourStart,
     );
 
+    const currentDate = new Date(Date.now());
+
     const availability = eachHourArray.map(hour => {
       const hasAppointmentInHour = appointments.find(
         appointment => getHours(appointment.date) === hour,
       );
 
-      const compareDate = new Date(year, month - 1, hour);
+      const compareDate = new Date(year, month - 1, day, hour);
 
       return {
         hour,
