@@ -9,11 +9,11 @@ class ProvidersController {
 
     const listProviders = container.resolve(ListProvidersService);
 
-    const appointment = await listProviders.execute({
+    const providers = await listProviders.execute({
       userId,
     });
 
-    return response.json(appointment);
+    return response.json(providers);
   }
 }
 
