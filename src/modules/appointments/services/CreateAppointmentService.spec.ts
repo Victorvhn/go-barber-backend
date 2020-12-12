@@ -17,7 +17,10 @@ describe('CreateAppointment', () => {
   const userId = '654321';
 
   it('should be able to create a new appointment', async () => {
-    const date = startOfHour(new Date());
+    const mockDate = new Date(2020, 4, 10, 12);
+    const date = startOfHour(new Date(2020, 4, 10, 13));
+
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDate.getTime());
 
     const appointment = await createAppointment.execute({
       date,
@@ -32,7 +35,11 @@ describe('CreateAppointment', () => {
   });
 
   it('should not be able to create two appointment on the same time', async () => {
-    const date = startOfHour(new Date(2020, 9, 27, 3, 39));
+    const date = startOfHour(new Date(2020, 9, 27, 10, 39));
+
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementation(() => new Date(2020, 9, 27, 9, 39).getTime());
 
     const appointment = await createAppointment.execute({
       date,
@@ -51,6 +58,68 @@ describe('CreateAppointment', () => {
         userId,
         providerId,
       }),
-    ).rejects.toStrictEqual(new AppError('This appointment is already booked'));
+    ).rejects.toStrictEqual(
+      new AppError('This appointment is already booked', 400),
+    );
+  });
+
+  it('should not be able to create an appointment on a past date', async () => {
+    const oldDate = new Date(2020, 4, 10, 12, 30);
+    const date = startOfHour(oldDate);
+
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => oldDate.getTime());
+
+    await expect(
+      createAppointment.execute({
+        providerId,
+        userId,
+        date,
+      }),
+    ).rejects.toStrictEqual(
+      new AppError("You cant't create an appointment on a past date", 400),
+    );
+  });
+
+  it('should not be able to create an appointment with same user as provider', async () => {
+    const oldDate = new Date(2020, 4, 10, 12, 30);
+    const date = startOfHour(oldDate);
+
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => oldDate.getTime());
+
+    await expect(
+      createAppointment.execute({
+        providerId,
+        userId: providerId,
+        date,
+      }),
+    ).rejects.toStrictEqual(
+      new AppError("You cant't create an appointment with your self", 400),
+    );
+  });
+
+  it('should not be able to create an appointment before 8am and after 5pm', async () => {
+    jest
+      .spyOn(Date, 'now')
+      .mockImplementationOnce(() => new Date(2020, 4, 10, 12).getTime());
+
+    await expect(
+      createAppointment.execute({
+        providerId,
+        userId,
+        date: new Date(2020, 4, 12, 7),
+      }),
+    ).rejects.toStrictEqual(
+      new AppError('You can only create appointment between 8am and 5pm', 400),
+    );
+
+    await expect(
+      createAppointment.execute({
+        providerId,
+        userId,
+        date: new Date(2020, 4, 12, 18),
+      }),
+    ).rejects.toStrictEqual(
+      new AppError('You can only create appointment between 8am and 5pm', 400),
+    );
   });
 });
