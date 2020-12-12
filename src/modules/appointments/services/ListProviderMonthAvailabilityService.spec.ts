@@ -1,14 +1,14 @@
 import FakeAppointmentRepository from '../repositories/fakes/FakeAppointmentRepository';
-import ListProviderMonthAvailibityService from './ListProviderMonthAvailibityService';
+import ListProviderMonthAvailabilityService from './ListProviderMonthAvailabilityService';
 
 let fakeAppointmentRepository: FakeAppointmentRepository;
-let listProviderMonthAvailibity: ListProviderMonthAvailibityService;
+let listProviderMonthAvailability: ListProviderMonthAvailabilityService;
 
 describe('ListProviderMonthAvailibity', () => {
   beforeEach(() => {
     fakeAppointmentRepository = new FakeAppointmentRepository();
 
-    listProviderMonthAvailibity = new ListProviderMonthAvailibityService(
+    listProviderMonthAvailability = new ListProviderMonthAvailabilityService(
       fakeAppointmentRepository,
     );
   });
@@ -71,7 +71,7 @@ describe('ListProviderMonthAvailibity', () => {
       date: new Date(2020, 4, 21, 8, 0, 0),
     });
 
-    const availability = await listProviderMonthAvailibity.execute({
+    const availability = await listProviderMonthAvailability.execute({
       providerId,
       month: 5,
       year: 2020,
