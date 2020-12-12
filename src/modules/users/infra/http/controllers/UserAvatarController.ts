@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import UpdateUserAvatarService from '@modules/users/services/UpdateUserAvatarService';
 
@@ -15,11 +16,7 @@ class UserAvatarController {
       avatarFilename: filename,
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete user.password;
-
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 }
 
