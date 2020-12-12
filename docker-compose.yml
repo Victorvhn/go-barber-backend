@@ -10,3 +10,9 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+
+  mongo:
+    container_name: mongodb
+    image: mongo
+    ports:
+      - "27017:27017"
