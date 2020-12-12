@@ -2,16 +2,23 @@ import { startOfHour } from 'date-fns';
 
 import AppError from '@shared/errors/AppError';
 
+import FakeNotificationRepository from '@modules/notifications/repositories/fakes/FakeNotificationRepository';
 import FakeAppointmentRepository from '../repositories/fakes/FakeAppointmentRepository';
 import CreateAppointmentService from './CreateAppointmentService';
 
 let fakeAppointmentRepository: FakeAppointmentRepository;
+let fakeNotificationRepository: FakeNotificationRepository;
 let createAppointment: CreateAppointmentService;
 
 describe('CreateAppointment', () => {
   beforeEach(() => {
     fakeAppointmentRepository = new FakeAppointmentRepository();
-    createAppointment = new CreateAppointmentService(fakeAppointmentRepository);
+    fakeNotificationRepository = new FakeNotificationRepository();
+
+    createAppointment = new CreateAppointmentService(
+      fakeAppointmentRepository,
+      fakeNotificationRepository,
+    );
   });
   const providerId = '123456';
   const userId = '654321';
