@@ -17,3 +17,10 @@ services:
     ports:
       - "27017:27017"
     restart: unless-stopped
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped

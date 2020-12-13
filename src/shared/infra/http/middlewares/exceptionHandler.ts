@@ -8,6 +8,8 @@ function exceptionHandler(
   response: Response,
   _: NextFunction,
 ): Response {
+  console.error(error);
+
   if (error instanceof AppError) {
     return response
       .status(error.statusCode)
