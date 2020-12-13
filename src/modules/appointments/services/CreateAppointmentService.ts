@@ -4,8 +4,10 @@ import { startOfHour, isBefore, getHours, format } from 'date-fns';
 import AppError from '@shared/errors/AppError';
 
 import INotificationRepository from '@modules/notifications/repositories/INotificationRepository';
-import Appointment from '../infra/typeorm/entities/Appointment';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 import IAppointmentRepository from '../repositories/IAppointmentRepository';
+
+import Appointment from '../infra/typeorm/entities/Appointment';
 
 interface IRequest {
   providerId: string;
@@ -21,6 +23,9 @@ class CreateAppointmentService {
 
     @inject('NotificationRepository')
     private notificationRepository: INotificationRepository,
+
+    @inject('CacheProvider')
+    private cacheProvider: ICacheProvider,
   ) {}
 
   public async execute({
@@ -71,6 +76,13 @@ class CreateAppointmentService {
       recipientId: providerId,
       content: `Novo agendamento para dia ${formattedDate}`,
     });
+
+    await this.cacheProvider.invalidate(
+      `provider-appointments:${providerId}:${format(
+        appointmentDate,
+        'yyyy-M-d',
+      )}`,
+    );
 
     return appointment;
   }
