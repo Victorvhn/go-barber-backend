@@ -25,7 +25,7 @@ class ListProvidersService {
       `providers-list:${user_id}`,
     );
 
-    if (!users) {
+    if (!users?.length) {
       users = await this.usersRepository.findAllProviders({
         except_user_id: user_id,
       });
