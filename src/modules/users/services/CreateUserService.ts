@@ -1,9 +1,8 @@
-import { inject, injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
-
 import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
-import IUserRepository from '../repositories/IUserRepository';
+import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
 import User from '../infra/typeorm/entities/User';
@@ -17,8 +16,8 @@ interface IRequest {
 @injectable()
 class CreateUserService {
   constructor(
-    @inject('UserRepository')
-    private userRepository: IUserRepository,
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
@@ -28,19 +27,21 @@ class CreateUserService {
   ) {}
 
   public async execute({ name, email, password }: IRequest): Promise<User> {
-    const checkUserExists = await this.userRepository.findByEmail(email);
+    const checkUserExists = await this.usersRepository.findByEmail(email);
 
-    if (checkUserExists) throw new AppError('Email address already used.');
+    if (checkUserExists) {
+      throw new AppError('Email address already used.');
+    }
 
     const hashedPassword = await this.hashProvider.generateHash(password);
 
-    const user = await this.userRepository.create({
+    const user = await this.usersRepository.create({
       name,
       email,
       password: hashedPassword,
     });
 
-    this.cacheProvider.invalidatePrefix('providers-list');
+    await this.cacheProvider.invalidatePrefix('providers-list');
 
     return user;
   }

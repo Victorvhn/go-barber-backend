@@ -1,25 +1,20 @@
-import nomemailer, { Transporter } from 'nodemailer';
+import nodemailer, { Transporter } from 'nodemailer';
 import { injectable, inject } from 'tsyringe';
 
 import IMailTemplateProvider from '@shared/container/providers/MailTemplateProvider/models/IMailTemplateProvider';
 import IMailProvider from '../models/IMailProvider';
-import ISendMailDto from '../dtos/ISendMailDto';
-
-interface IMessage {
-  to: string;
-  body: string;
-}
+import ISendMailDTO from '../dtos/ISendMailDTO';
 
 @injectable()
-export default class EtherialMailProvider implements IMailProvider {
+export default class EtherealMailProvider implements IMailProvider {
   private client: Transporter;
 
   constructor(
     @inject('MailTemplateProvider')
     private mailTemplateProvider: IMailTemplateProvider,
   ) {
-    nomemailer.createTestAccount().then(account => {
-      const transporter = nomemailer.createTransport({
+    nodemailer.createTestAccount().then(account => {
+      const transporter = nodemailer.createTransport({
         host: account.smtp.host,
         port: account.smtp.port,
         secure: account.smtp.secure,
@@ -38,7 +33,7 @@ export default class EtherialMailProvider implements IMailProvider {
     from,
     subject,
     templateData,
-  }: ISendMailDto): Promise<void> {
+  }: ISendMailDTO): Promise<void> {
     const message = await this.client.sendMail({
       from: {
         name: from?.name || 'Equipe GoBarber',
@@ -52,7 +47,7 @@ export default class EtherialMailProvider implements IMailProvider {
       html: await this.mailTemplateProvider.parse(templateData),
     });
 
-    console.log('Meesage sent: %s', message.messageId);
-    console.log('Preview URL: %s', nomemailer.getTestMessageUrl(message));
+    console.log('Message sent: %s', message.messageId);
+    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(message));
   }
 }

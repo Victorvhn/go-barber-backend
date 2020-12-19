@@ -1,10 +1,8 @@
 import Redis, { Redis as RedisClient } from 'ioredis';
-
 import cacheConfig from '@config/cache';
-
 import ICacheProvider from '../models/ICacheProvider';
 
-class RedisCacheProvider implements ICacheProvider {
+export default class RedisCacheProvider implements ICacheProvider {
   private client: RedisClient;
 
   constructor() {
@@ -12,7 +10,7 @@ class RedisCacheProvider implements ICacheProvider {
   }
 
   public async save(key: string, value: any): Promise<void> {
-    this.client.set(key, JSON.stringify(value));
+    await this.client.set(key, JSON.stringify(value));
   }
 
   public async recover<T>(key: string): Promise<T | null> {
@@ -36,10 +34,10 @@ class RedisCacheProvider implements ICacheProvider {
 
     const pipeline = this.client.pipeline();
 
-    keys.forEach(key => pipeline.del(key));
+    keys.forEach(key => {
+      pipeline.del(key);
+    });
 
     await pipeline.exec();
   }
 }
-
-export default RedisCacheProvider;

@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export default class CreateUserTokens1604339239836
+export default class CreateUserTokens1588703882026
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -37,7 +37,7 @@ export default class CreateUserTokens1604339239836
         ],
         foreignKeys: [
           {
-            name: 'token_user',
+            name: 'TokenUser',
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
             columnNames: ['user_id'],

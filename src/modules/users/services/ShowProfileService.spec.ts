@@ -1,37 +1,38 @@
-import { v4 as uuid } from 'uuid';
-
 import AppError from '@shared/errors/AppError';
 
-import FakeUserRepository from '../repositories/fakes/FakeUserRepository';
+import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
 import ShowProfileService from './ShowProfileService';
 
-let fakeUserRepository: FakeUserRepository;
+let fakeUsersRepository: FakeUsersRepository;
 let showProfile: ShowProfileService;
 
 describe('UpdateProfile', () => {
   beforeEach(() => {
-    fakeUserRepository = new FakeUserRepository();
+    fakeUsersRepository = new FakeUsersRepository();
 
-    showProfile = new ShowProfileService(fakeUserRepository);
+    showProfile = new ShowProfileService(fakeUsersRepository);
   });
 
-  it('should be able to show the profile', async () => {
-    const persistedUser = await fakeUserRepository.create({
+  it('should be able show the profile', async () => {
+    const user = await fakeUsersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
       password: '123456',
     });
 
-    const user = await showProfile.execute({ userId: persistedUser.id });
+    const profile = await showProfile.execute({
+      user_id: user.id,
+    });
 
-    expect(user).toBe(persistedUser);
+    expect(profile.name).toBe('John Doe');
+    expect(profile.email).toBe('johndoe@example.com');
   });
 
-  it('should not be able to show the profile from non-existing user', async () => {
-    await expect(
+  it('should not be able show the profile from non-existing user', async () => {
+    expect(
       showProfile.execute({
-        userId: uuid(),
+        user_id: 'non-existing-user-id',
       }),
-    ).rejects.toStrictEqual(new AppError('User not found.', 400));
+    ).rejects.toBeInstanceOf(AppError);
   });
 });

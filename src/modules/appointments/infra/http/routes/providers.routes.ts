@@ -7,6 +7,7 @@ import ProviderMonthAvailabilityController from '../controllers/ProviderMonthAva
 import ProviderDayAvailabilityController from '../controllers/ProviderDayAvailabilityController';
 
 const providersRouter = Router();
+
 const providersController = new ProvidersController();
 const providerMonthAvailabilityController = new ProviderMonthAvailabilityController();
 const providerDayAvailabilityController = new ProviderDayAvailabilityController();
@@ -14,20 +15,21 @@ const providerDayAvailabilityController = new ProviderDayAvailabilityController(
 providersRouter.use(ensureAuthenticated);
 
 providersRouter.get('/', providersController.index);
+
 providersRouter.get(
-  '/:providerId/month-availability',
+  '/:provider_id/month-availability',
   celebrate({
     [Segments.PARAMS]: {
-      providerId: Joi.string().uuid().required(),
+      provider_id: Joi.string().uuid().required(),
     },
   }),
   providerMonthAvailabilityController.index,
 );
 providersRouter.get(
-  '/:providerId/day-availability',
+  '/:provider_id/day-availability',
   celebrate({
     [Segments.PARAMS]: {
-      providerId: Joi.string().uuid().required(),
+      provider_id: Joi.string().uuid().required(),
     },
   }),
   providerDayAvailabilityController.index,

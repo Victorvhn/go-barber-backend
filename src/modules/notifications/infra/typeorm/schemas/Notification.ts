@@ -15,17 +15,17 @@ class Notification {
   @Column()
   content: string;
 
-  @Column({ name: 'recipient_id', type: 'uuid' })
-  recipientId: string;
+  @Column('uuid')
+  recipient_id: string;
 
   @Column({ default: false })
   read: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  @CreateDateColumn()
+  created_at: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  @UpdateDateColumn()
+  updated_at: Date;
 }
 
 export default Notification;

@@ -5,22 +5,25 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export default class AddUserIdToAppointment1607735932586
+export default class AlterProviderFieldToProviderId1586467678042
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropColumn('appointments', 'provider');
+
     await queryRunner.addColumn(
       'appointments',
       new TableColumn({
-        name: 'user_id',
+        name: 'provider_id',
         type: 'uuid',
         isNullable: true,
       }),
     );
+
     await queryRunner.createForeignKey(
       'appointments',
       new TableForeignKey({
-        name: 'appointment_user',
-        columnNames: ['user_id'],
+        name: 'AppointmentProvider',
+        columnNames: ['provider_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'SET NULL',
@@ -30,7 +33,16 @@ export default class AddUserIdToAppointment1607735932586
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('appointments', 'appointment_user');
-    await queryRunner.dropColumn('appointments', 'user_id');
+    await queryRunner.dropForeignKey('appointments', 'AppointmentProvider');
+
+    await queryRunner.dropColumn('appointments', 'provider_id');
+
+    await queryRunner.addColumn(
+      'appointments',
+      new TableColumn({
+        name: 'provider',
+        type: 'varchar',
+      }),
+    );
   }
 }

@@ -2,7 +2,7 @@ import path from 'path';
 import crypto from 'crypto';
 import multer, { StorageEngine } from 'multer';
 
-const tempFolter = path.resolve(__dirname, '..', '..', 'temp');
+const tmpFolder = path.resolve(__dirname, '..', '..', 'tmp');
 
 interface IUploadConfig {
   driver: 's3' | 'disk';
@@ -24,13 +24,13 @@ interface IUploadConfig {
 export default {
   driver: process.env.STORAGE_DRIVER,
 
-  tmpFolder: tempFolter,
-  uploadsFolder: path.resolve(tempFolter, 'uploads'),
+  tmpFolder,
+  uploadsFolder: path.resolve(tmpFolder, 'uploads'),
 
   multer: {
     storage: multer.diskStorage({
-      destination: tempFolter,
-      filename(request, file, callback) {
+      destination: tmpFolder,
+      filename: (request, file, callback) => {
         const fileHash = crypto.randomBytes(10).toString('hex');
         const fileName = `${fileHash}-${file.originalname}`;
 
@@ -40,6 +40,7 @@ export default {
   },
 
   config: {
+    disk: {},
     aws: {
       bucket: 'app-gobarber-victorvhn',
     },

@@ -1,38 +1,34 @@
 import AppError from '@shared/errors/AppError';
 
-import FakeUserRepository from '../repositories/fakes/FakeUserRepository';
+import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
 import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
 import AuthenticateUserService from './AuthenticateUserService';
 
-let fakeUserRepository: FakeUserRepository;
+let fakeUsersRepository: FakeUsersRepository;
 let fakeHashProvider: FakeHashProvider;
 let authenticateUser: AuthenticateUserService;
 
 describe('AuthenticateUser', () => {
   beforeEach(() => {
-    fakeUserRepository = new FakeUserRepository();
+    fakeUsersRepository = new FakeUsersRepository();
     fakeHashProvider = new FakeHashProvider();
 
     authenticateUser = new AuthenticateUserService(
-      fakeUserRepository,
+      fakeUsersRepository,
       fakeHashProvider,
     );
   });
 
   it('should be able to authenticate', async () => {
-    const name = 'John Doe';
-    const email = 'johndoe@example.com';
-    const password = '123456';
-
-    const user = await fakeUserRepository.create({
-      name,
-      email,
-      password,
+    const user = await fakeUsersRepository.create({
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      password: '123456',
     });
 
     const response = await authenticateUser.execute({
-      email,
-      password,
+      email: 'johndoe@example.com',
+      password: '123456',
     });
 
     expect(response).toHaveProperty('token');
@@ -42,32 +38,24 @@ describe('AuthenticateUser', () => {
   it('should not be able to authenticate with non existing user', async () => {
     await expect(
       authenticateUser.execute({
-        email: 'johndoe2@example.com',
-        password: '123',
+        email: 'johndoe@example.com',
+        password: '123456',
       }),
-    ).rejects.toStrictEqual(
-      new AppError('Incorrect email/password combination.', 401),
-    );
+    ).rejects.toBeInstanceOf(AppError);
   });
 
   it('should not be able to authenticate with wrong password', async () => {
-    const name = 'John Doe';
-    const email = 'johndoe@example.com';
-    const password = '123456';
-
-    await fakeUserRepository.create({
-      name,
-      email,
-      password,
+    await fakeUsersRepository.create({
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      password: '123456',
     });
 
     await expect(
       authenticateUser.execute({
-        email,
-        password: '12345',
+        email: 'johndoe@example.com',
+        password: 'wrong-password',
       }),
-    ).rejects.toStrictEqual(
-      new AppError('Incorrect email/password combination.', 401),
-    );
+    ).rejects.toBeInstanceOf(AppError);
   });
 });
