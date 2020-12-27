@@ -20,6 +20,7 @@ jobs:
           node-version: 14.x
 
       - name: Setup yarn cache
+        id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
