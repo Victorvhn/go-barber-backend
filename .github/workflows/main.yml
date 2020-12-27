@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+    
+      # Install deps
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.4
+        with:
+          node-version: 14.x
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn
+      
+      # Build proj
+      - name: Build project
+        run: yarn build
+        
+      # Copy files to Digital Ocean
+      - name: Copy builded files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          source: ".,!node_modules"
+          target: "~/app/go-barber-backend"
+      
+      # Install proj deps
+      - name: Install dependencies on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          script: |
+            cd ~/app/go-barber-backend
+            yarn
+
+      # Execute migrations
+      - name: Execute migrations on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          script: |
+            cd ~/app/go-barber-backend
+            yarn typeorm migration:run
+
+      # Restart node.js server
+      - name: Restart node.js server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          script: |
+            pm2 restart go-barber-api
