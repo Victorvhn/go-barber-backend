@@ -1,0 +1,35 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres
+    image: bitnami/postgresql:latest
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=
+      - POSTGRESQL_DATABASE=gobarber
+    ports:
+      - "35432:5432"
+    restart: unless-stopped
+
+  mongo:
+    container_name: mongodb
+    image: bitnami/mongodb:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=false
+      - MONGODB_USERNAME=mongodb
+      - MONGODB_PASSWORD=
+      - MONGODB_DATABASE=gobarber
+    ports:
+      - "327017:27017"
+    restart: unless-stopped
+
+  redis:
+    container_name: redis
+    image: bitnami/redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=false
+      - REDIS_PASSWORD=
+    ports:
+      - "36379:6379"
+    restart: unless-stopped
