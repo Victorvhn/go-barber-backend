@@ -50,5 +50,36 @@ jobs:
           target: "~/app/go-barber-backend"
       
       # Install proj deps
+      - name: Install dependencies on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          script: |
+            cd ~/app/go-barber-backend
+            yarn
+
       # Execute migrations
+      - name: Execute migrations on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          script: |
+            cd ~/app/go-barber-backend
+            yarn typeorm migration:run
+
       # Restart node.js server
+      - name: Restart node.js server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          script: |
+            pm2 restart go-barber-api
