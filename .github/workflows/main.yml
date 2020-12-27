@@ -35,7 +35,7 @@ jobs:
           port: ${{ secrets.GOBARBER_SSH_PORT }}
           key: ${{ secrets.GOBARBER_SSH_KEY }}
           source: "dist"
-          targer: "test"
+          target: "test"
       
       # Replace old code with neewer
       # Install proj deps
