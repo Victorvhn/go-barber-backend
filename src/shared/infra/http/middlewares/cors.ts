@@ -10,15 +10,5 @@ export default async function cors(
     `${process.env.APP_WEB_URL}`,
   );
 
-  response.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS, PUT, PATCH, DELETE',
-  );
-
-  response.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-Requested-With,content-type',
-  );
-
   next();
 }
