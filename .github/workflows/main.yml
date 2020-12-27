@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+    
+      # Install deps
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.4
+        with:
+          node-version: 14.x
+
+      - name: Install dependencies
+        run: yarn
+      
+      # Build proj
+      - name: Build project
+        run: yarn build
+        
+      # Copy files to Digital Ocean
+      - name: Copy builded files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.GOBARBER_SSH_HOST }}
+          username:  ${{ secrets.GOBARBER_SSH_USER }}
+          port: ${{ secrets.GOBARBER_SSH_PORT }}
+          key: ${{ secrets.GOBARBER_SSH_KEY }}
+          source: "dist"
+          targer: "test"
+      
+      # Replace old code with neewer
+      # Install proj deps
+      # Execute migrations
+      # Restart node.js server
