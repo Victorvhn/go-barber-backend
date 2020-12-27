@@ -46,10 +46,9 @@ jobs:
           username:  ${{ secrets.GOBARBER_SSH_USER }}
           port: ${{ secrets.GOBARBER_SSH_PORT }}
           key: ${{ secrets.GOBARBER_SSH_KEY }}
-          source: "."
+          source: ".,!node_modules"
           target: "~/app/go-barber-backend"
       
-      # Replace old code with neewer
       # Install proj deps
       # Execute migrations
       # Restart node.js server
