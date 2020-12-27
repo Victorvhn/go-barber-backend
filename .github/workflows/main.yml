@@ -19,6 +19,13 @@ jobs:
         with:
           node-version: 14.x
 
+      - name: Setup yarn cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore: |
+            ${{ runner.os }}-yarn-
+
       - name: Install dependencies
         run: yarn
       
@@ -34,8 +41,8 @@ jobs:
           username:  ${{ secrets.GOBARBER_SSH_USER }}
           port: ${{ secrets.GOBARBER_SSH_PORT }}
           key: ${{ secrets.GOBARBER_SSH_KEY }}
-          source: "dist"
-          target: "test"
+          source: "."
+          target: "~/app/go-barber-backend"
       
       # Replace old code with neewer
       # Install proj deps
